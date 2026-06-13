@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:installed_apps/installed_apps.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -37,11 +38,19 @@ class _HomeState extends State<Home> {
 
     await speechToText.listen(
       onResult: (result) {
-        debugPrint("WORDS: ${result.recognizedWords}");
-
         setState(() {
           spokenText = result.recognizedWords;
         });
+
+        String command = result.recognizedWords.toLowerCase();
+
+        if (result.finalResult) {
+          String command = result.recognizedWords.toLowerCase();
+
+          if (command.contains("gmail")) {
+            openGmail();
+          }
+        }
       },
     );
 
@@ -54,13 +63,14 @@ class _HomeState extends State<Home> {
     debugPrint("STOPPED");
   }
 
+  Future<void> openGmail() async {
+    await InstalledApps.startApp("com.google.android.gm");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Voice Assistant"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Voice Assistant"), centerTitle: true),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -77,15 +87,11 @@ class _HomeState extends State<Home> {
                 width: 180,
                 height: 180,
                 decoration: BoxDecoration(
-                  color: speechToText.isListening
-                      ? Colors.green
-                      : Colors.red,
+                  color: speechToText.isListening ? Colors.green : Colors.red,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  speechToText.isListening
-                      ? Icons.mic
-                      : Icons.mic_none,
+                  speechToText.isListening ? Icons.mic : Icons.mic_none,
                   color: Colors.white,
                   size: 60,
                 ),
@@ -95,13 +101,8 @@ class _HomeState extends State<Home> {
             const SizedBox(height: 30),
 
             Text(
-              speechToText.isListening
-                  ? "Listening..."
-                  : "Tap To Speak",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              speechToText.isListening ? "Listening..." : "Tap To Speak",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 30),
@@ -111,9 +112,7 @@ class _HomeState extends State<Home> {
               child: Text(
                 spokenText,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 22,
-                ),
+                style: const TextStyle(fontSize: 22),
               ),
             ),
           ],
