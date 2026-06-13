@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class Home extends StatefulWidget {
@@ -11,74 +10,114 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final SpeechToText speechToText = SpeechToText();
-  bool isListen = false;
-  String spokenText = "tap to speak";
+
+  String spokenText = "Tap To Speak";
 
   @override
-  void initState() {
-    super.initState();
+  void initState() {Future<void> initSpeech() async {
+  bool available = await speechToText.initialize(
+    onStatus: (status) {
+      debugPrint("STATUS: $status");
+    },
+    onError: (error) {
+      debugPrint("ERROR: $error");
+    },
+  );
+
+  debugPrint("AVAILABLE: $available");
+}
     initSpeech();
   }
 
-  Future<void> initSpeech() async {
-    await speechToText.initialize();
-  }
+Future<void> initSpeech() async {
+  bool available = await speechToText.initialize(
+    onStatus: (status) {
+      debugPrint("STATUS: $status");
+    },
+    onError: (error) {
+      debugPrint("ERROR: $error");
+    },
+  );
+
+  debugPrint("AVAILABLE: $available");
+}
 
   void startListening() async {
-    await speechToText.listen(
-      onResult: (result) {
-        setState(() {
-          spokenText = result.recognizedWords;
-        });
-      },
-    );
+    if (!speechToText.isListening) {
+      await speechToText.listen(
+        onResult: (result) {
+          setState(() {
+            spokenText = result.recognizedWords;
+          });
+        },
+      );
+    } else {
+      await speechToText.stop();
+    }
+
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 75,
+        centerTitle: true,
+        backgroundColor: Colors.blue,
         title: Text(
           "Voice Assistant",
           style: TextStyle(
-            fontWeight: .bold,
+            fontWeight: FontWeight.bold,
             color: Colors.white,
             fontSize: 30,
           ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
       ),
-      body: Column(
-        mainAxisAlignment: .center,
-        children: [
-          Center(
-            child: Container(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
               width: 150,
               height: 150,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.red,
               ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: .center,
-                  children: [
-                    IconButton(
-                      onPressed: startListening,
-                      icon: Icon(Icons.mic, size: 40),
-                      color: Colors.white,
-                    ),
-                    SizedBox(height: 5),
-                    Text('tap to speak', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      print("BUTTON WORKING");
+
+                      setState(() {
+                        spokenText = "Button Clicked";
+                      });
+                    },
+                    icon: const Icon(Icons.mic, size: 40),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    "Tap To Speak",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
               ),
             ),
-          ),
-          Text(spokenText, style: TextStyle(color: Colors.black)),
-        ],
+
+            const SizedBox(height: 30),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                spokenText,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 20, color: Colors.black),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
