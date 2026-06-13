@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:installed_apps/installed_apps.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:voicein/services/appLauncher_service.dart';
 
@@ -12,15 +11,15 @@ class Voice extends StatefulWidget {
 
 class _VoiceState extends State<Voice> {
   final SpeechToText stx = SpeechToText();
-  String inputedText = "input text here show";
-  //start the system speech engine
+
+  String inputedText = "Tap To Speak";
+
   @override
   void initState() {
     super.initState();
     speechinit();
   }
 
-  //check for microphone and speech text engine
   Future<void> speechinit() async {
     await stx.initialize();
   }
@@ -28,22 +27,23 @@ class _VoiceState extends State<Voice> {
   Future<void> speechlisten() async {
     await stx.listen(
       onResult: (result) {
-        stx.listen(
-          onResult: (result) {
+        setState(() {
+          inputedText = result.recognizedWords;
+        });
+
+        if (result.finalResult) {
+          String command = result.recognizedWords.toLowerCase();
+
+          if (command.contains("gmail")) {
+            ApplauncherService.openGmail();
+          } else if (command.contains("whatsapp")) {
+            ApplauncherService.openWhatsapp();
+          } else {
             setState(() {
-              inputedText = result.recognizedWords;
-              //this will open the gmail
-              String command = result.recognizedWords.toLowerCase();
-              if (command.contains("gmail")) {
-                ApplauncherService.openGmail();
-              } else if (command.contains("whatsapp")) {
-                ApplauncherService.openWhatsapp();
-              } else {
-                inputedText = "no input";
-              }
+              inputedText = "no input detected";
             });
-          },
-        );
+          }
+        }
       },
     );
   }
@@ -52,25 +52,26 @@ class _VoiceState extends State<Voice> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Voice Assistant",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text("Voice Assistant", style: TextStyle(color: Colors.white)),
         centerTitle: true,
+        backgroundColor: Colors.pink,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //for tapping the container
             GestureDetector(
               onTap: () {
-                speechlisten();
+                if (stx.isListening) {
+                  stx.stop();
+                } else {
+                  speechlisten();
+                }
               },
               child: Container(
                 width: 200,
                 height: 200,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.pink,
                   shape: BoxShape.circle,
                 ),
@@ -79,14 +80,14 @@ class _VoiceState extends State<Voice> {
             ),
 
             SizedBox(height: 30),
-            //hint text for the user
+
             Text(
               "Tap To Speak",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             SizedBox(height: 30),
-            // show the user input text
+
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
