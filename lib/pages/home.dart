@@ -14,95 +14,93 @@ class _HomeState extends State<Home> {
   String spokenText = "Tap To Speak";
 
   @override
-  void initState() {Future<void> initSpeech() async {
-  bool available = await speechToText.initialize(
-    onStatus: (status) {
-      debugPrint("STATUS: $status");
-    },
-    onError: (error) {
-      debugPrint("ERROR: $error");
-    },
-  );
-
-  debugPrint("AVAILABLE: $available");
-}
+  void initState() {
+    super.initState();
     initSpeech();
   }
 
-Future<void> initSpeech() async {
-  bool available = await speechToText.initialize(
-    onStatus: (status) {
-      debugPrint("STATUS: $status");
-    },
-    onError: (error) {
-      debugPrint("ERROR: $error");
-    },
-  );
+  Future<void> initSpeech() async {
+    bool available = await speechToText.initialize(
+      onStatus: (status) {
+        debugPrint("STATUS: $status");
+      },
+      onError: (error) {
+        debugPrint("ERROR: $error");
+      },
+    );
 
-  debugPrint("AVAILABLE: $available");
-}
+    debugPrint("AVAILABLE: $available");
+  }
 
-  void startListening() async {
-    if (!speechToText.isListening) {
-      await speechToText.listen(
-        onResult: (result) {
-          setState(() {
-            spokenText = result.recognizedWords;
-          });
-        },
-      );
-    } else {
-      await speechToText.stop();
-    }
+  Future<void> startListening() async {
+    debugPrint("START LISTENING");
 
-    setState(() {});
+    await speechToText.listen(
+      onResult: (result) {
+        debugPrint("WORDS: ${result.recognizedWords}");
+
+        setState(() {
+          spokenText = result.recognizedWords;
+        });
+      },
+    );
+
+    debugPrint("LISTEN CALLED");
+  }
+
+  Future<void> stopListening() async {
+    await speechToText.stop();
+
+    debugPrint("STOPPED");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text("Voice Assistant"),
         centerTitle: true,
-        backgroundColor: Colors.blue,
-        title: Text(
-          "Voice Assistant",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 30,
-          ),
-        ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 150,
-              height: 150,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.red,
+            GestureDetector(
+              onTap: () {
+                if (!speechToText.isListening) {
+                  startListening();
+                } else {
+                  stopListening();
+                }
+              },
+              child: Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                  color: speechToText.isListening
+                      ? Colors.green
+                      : Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  speechToText.isListening
+                      ? Icons.mic
+                      : Icons.mic_none,
+                  color: Colors.white,
+                  size: 60,
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      print("BUTTON WORKING");
+            ),
 
-                      setState(() {
-                        spokenText = "Button Clicked";
-                      });
-                    },
-                    icon: const Icon(Icons.mic, size: 40),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    "Tap To Speak",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
+            const SizedBox(height: 30),
+
+            Text(
+              speechToText.isListening
+                  ? "Listening..."
+                  : "Tap To Speak",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
 
@@ -113,7 +111,9 @@ Future<void> initSpeech() async {
               child: Text(
                 spokenText,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 20, color: Colors.black),
+                style: const TextStyle(
+                  fontSize: 22,
+                ),
               ),
             ),
           ],
