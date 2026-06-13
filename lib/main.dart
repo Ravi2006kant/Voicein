@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voicein/pages/home.dart';
+import 'package:voicein/pages/voice.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,6 +11,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: Home(), debugShowCheckedModeBanner: false);
+    return MaterialApp(home: Voice(), debugShowCheckedModeBanner: false);
   }
 }
