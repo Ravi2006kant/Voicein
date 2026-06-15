@@ -5,7 +5,8 @@ class Command {
   static void process(String command) {
     command = command.toLowerCase();
 
-    if (command.startsWith("send email")) {
+    // Send email to xyz@gmail.com
+    if (command.contains("send email")) {
       final emailRegex = RegExp(
         r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}',
       );
@@ -14,16 +15,25 @@ class Command {
 
       if (match != null) {
         String email = match.group(0)!;
-        EmailService.composeEmail(email);
+
+        EmailService.composeEmail(
+          email,
+          subject: "Hello",
+          body: "",
+        );
       }
 
       return;
     }
 
-    if (command.contains("gmail")) {
+    if (command.contains("open gmail")) {
       ApplauncherService.openGmail();
-    } else if (command.contains("whatsapp")) {
+      return;
+    }
+
+    if (command.contains("open whatsapp")) {
       ApplauncherService.openWhatsapp();
-    } else {}
+      return;
+    }
   }
 }

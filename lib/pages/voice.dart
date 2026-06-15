@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-
+import 'package:voicein/component/mic.dart';
 import 'package:voicein/services/command.dart';
 
 class Voice extends StatefulWidget {
@@ -11,6 +11,7 @@ class Voice extends StatefulWidget {
 }
 
 class _VoiceState extends State<Voice> {
+
   final SpeechToText stx = SpeechToText();
 
   String inputedText = "Tap To Speak";
@@ -26,16 +27,20 @@ class _VoiceState extends State<Voice> {
   }
 
   Future<void> speechlisten() async {
-    await stx.listen(
-      onResult: (result) {
-        setState(() {
-          inputedText = result.recognizedWords;
-        });
+  await stx.listen(
+    onResult: (result) {
+      setState(() {
+        inputedText = result.recognizedWords;
+      });
+
+      if (result.finalResult) {
+        String command = result.recognizedWords.toLowerCase();
 
         Command.process(command);
-      },
-    );
-  }
+      }
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +50,7 @@ class _VoiceState extends State<Voice> {
         centerTitle: true,
         backgroundColor: Colors.pink,
       ),
+
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -57,15 +63,7 @@ class _VoiceState extends State<Voice> {
                   speechlisten();
                 }
               },
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: const BoxDecoration(
-                  color: Colors.pink,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.mic, color: Colors.white, size: 60),
-              ),
+              child: Mic(),
             ),
 
             SizedBox(height: 30),
