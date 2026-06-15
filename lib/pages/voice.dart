@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:voicein/services/appLauncher_service.dart';
+
+import 'package:voicein/services/command.dart';
 
 class Voice extends StatefulWidget {
   const Voice({super.key});
@@ -13,7 +14,7 @@ class _VoiceState extends State<Voice> {
   final SpeechToText stx = SpeechToText();
 
   String inputedText = "Tap To Speak";
-
+  String command = "";
   @override
   void initState() {
     super.initState();
@@ -31,19 +32,7 @@ class _VoiceState extends State<Voice> {
           inputedText = result.recognizedWords;
         });
 
-        if (result.finalResult) {
-          String command = result.recognizedWords.toLowerCase();
-
-          if (command.contains("gmail")) {
-            ApplauncherService.openGmail();
-          } else if (command.contains("whatsapp")) {
-            ApplauncherService.openWhatsapp();
-          } else {
-            setState(() {
-              inputedText = "no input detected";
-            });
-          }
-        }
+        Command.process(command);
       },
     );
   }
