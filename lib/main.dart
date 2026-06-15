@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:voicein/pages/home.dart';
 import 'package:voicein/pages/voice.dart';
 
 void main() {
