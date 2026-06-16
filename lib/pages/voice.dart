@@ -14,7 +14,7 @@ class _VoiceState extends State<Voice> {
 
   final SpeechToText stx = SpeechToText();
 
-  String inputedText = "Tap To Speak";
+  String inputedText = "Voice Show Here..";
   String command = "";
   @override
   void initState() {
