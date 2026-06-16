@@ -6,13 +6,10 @@ class EmailService {
     String subject = "",
     String body = "",
   }) async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      queryParameters: {
-        'subject': subject,
-        'body': body,
-      },
+    final Uri emailUri = Uri.parse(
+      'mailto:$email'
+      '?subject=${Uri.encodeComponent(subject)}'
+      '&body=${Uri.encodeComponent(body)}',
     );
 
     await launchUrl(emailUri);
